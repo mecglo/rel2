@@ -5,7 +5,8 @@ sys.path.append(os.getcwd())
 sys.path.append(os.path.realpath('../'))
 import socket
 
-
+import pandas as pd
+import ast
 import diameter
 import time
 import _thread
@@ -91,10 +92,34 @@ def ReadBuffer():
                     else:
                         print("Is CEA")
                         
-                    
+                
+                #write all avps in dataframe
+                df = pd.DataFrame.from_dict(avps)
+                temp = pd.DataFrame()
+                temp_df = pd.DataFrame()
+                
+                df['misc_data'] =  df['misc_data'].astype(str)
+
+                for index, row in df.iterrows(): 
+                        if 'avp_' in row['misc_data']:
+                            res = ast.literal_eval(row['misc_data'])
+                            temp = pd.DataFrame.from_dict(res)
+                            temp_df = pd.concat([temp_df, temp], ignore_index=True)
+                            
+                            
+                        else:
+                            temp2 = df.filter(items = [index], axis=0)
+                            temp_df = pd.concat([temp_df, temp2], ignore_index=True)
+                            print(row)
+                            
+                FileName = "Command Code-" + str(packet_vars['command_code']) +".csv"
+                temp_df.to_csv(FileName,index = False)
+                
                 #if input("Print AVPs (Y/N):\t") == "Y":
                 for avp in avps:
                     print("\t\t" + str(avp))
+                    
+                    
         except KeyboardInterrupt:
             print("User exited background loop")
             break                       
@@ -186,19 +211,26 @@ while True:
         msisdn = str(input("MSISDN:\t"))
         print("Sending User-Data Request to " + str(hostname))
         SendRequest(diameter.Request_16777217_306(msisdn=msisdn))
+    elif request == "PLR":
+        imsi = "41006003779483"
+        print("Sending Provide location request to " + str(hostname))
+        SendRequest(diameter.Request_16777255_8388620(imsi=imsi,DestinationHost=DestinationHost))
+      
     elif request == "RIR":
+        '''
         imsi = str(input("IMSI:\t"))
         if len(imsi) != 0:
             print("Sending LCS Routing Information Request with IMSI to " + str(hostname))
             SendRequest(diameter.Request_16777291_8388622(imsi=imsi))
         else:
-            msisdn = str(input("MSISDN:\t"))
-            print("Sending LCS Routing Information Request with MSISDN to " + str(hostname))
-            #Generate and pass session ID here; insert and DB and update response as per this session ID
-            # Generate a timestamp-based ID
-            #timestamp_id = str(int(time.time()))
-            #sessionid = str(diameter_host) + ';' + diameter.generate_id(5) + ';1;app_gy'
-            SendRequest(diameter.Request_16777291_8388622(msisdn=msisdn))
+        '''
+        msisdn = str(input("MSISDN:\t"))
+        print("Sending LCS Routing Information Request with MSISDN to " + str(hostname))
+        #Generate and pass session ID here; insert in DB and update response as per this session ID
+        # Generate a timestamp-based ID
+        #timestamp_id = str(int(time.time()))
+        #sessionid = str(diameter_host) + ';' + diameter.generate_id(5) + ';1;app_gy'
+        SendRequest(diameter.Request_16777291_8388622(msisdn=msisdn))
     elif request == "PCRF-CCR":
         imsi = str(input("IMSI:\t"))
         apn = str(input("APN:\t"))
