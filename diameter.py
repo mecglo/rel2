@@ -2258,21 +2258,26 @@ class Diameter:
         return response
 
     #3GPP SLg - Provide Subscriber Location Request
-    def Request_16777255_8388620(self, imsi):
+    def Request_16777255_8388620(self, imsi,DestinationHost=None):
         avp = ''
         #ToDo - Update the Vendor Specific Application ID
-        avp += self.generate_avp(260, 40, "0000010a4000000c000028af000001024000000c01000024")           #Vendor-Specific-Application-ID
+        avp += self.generate_avp(260, 40, "0000010a4000000c000028af000001024000000c01000024") #NotPresent  #Vendor-Specific-Application-ID
         avp += self.generate_avp(277, 40, "00000001")                                                    #Auth-Session-State (Not maintained)        
         avp += self.generate_avp(264, 40, self.OriginHost)                                                    #Origin Host
         avp += self.generate_avp(296, 40, self.OriginRealm)                                                   #Origin Realm
-        avp += self.generate_avp(283, 40, str(binascii.hexlify(b'localdomain'),'ascii'))                 #Destination Realm
-        avp += self.generate_avp(293, 40, str(binascii.hexlify(b'mme-slg.localdomain'),'ascii'))                 #Destination Host        
+        avp += self.generate_avp(283, 40, self.DestRealm)                                               #Destination Realm
+        
+        if DestinationHost != None:
+            avp += self.generate_avp(293, 40, self.string_to_hex(DestinationHost))                      #Destination Host
+                                                   
+        #avp += self.generate_avp(283, 40, str(binascii.hexlify(b'localdomain'),'ascii'))                 #Destination Realm
+        #avp += self.generate_avp(293, 40, str(binascii.hexlify(b'mme-slg.localdomain'),'ascii'))                 #Destination Host        
         #SLg Location Type AVP
-        avp += self.generate_vendor_avp(2500, "c0", 10415, "00000000")
+        avp += self.generate_vendor_avp(2500, "c0", 10415, "00000000")                          #current location
         #Username (IMSI)
         avp += self.generate_avp(1, 40, self.string_to_hex(imsi))                                             #Username (IMSI)
         #LCS-EPS-Client-Name
-        LCS_EPS_Client_Name = self.generate_vendor_avp(1238, "c0", 10415, str(binascii.hexlify(b'PyHSS GMLC'),'ascii'))    #LCS Name String
+        LCS_EPS_Client_Name = self.generate_vendor_avp(1238, "c0", 10415, str(binascii.hexlify(b'MG GMLC'),'ascii'))    #LCS Name String
         LCS_EPS_Client_Name += self.generate_vendor_avp(1237, "c0", 10415, "00000002")     #LCS Format Indicator
         avp += self.generate_vendor_avp(2501, "c0", 10415, LCS_EPS_Client_Name)
         #LCS-Client-Type (Emergency Services)

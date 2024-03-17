@@ -13,17 +13,17 @@ mme:
   dest_ip: "192.168.100.17"
 
   #GMLC Number
-  gmlc_num: "923330053125"
+  gmlc_num: "923450053125"
 
 
   #Value to populate as the OriginHost in Diameter responses
-  OriginHost: "ISBGMLCMG.epc.mnc006.mcc410.3gppnetwork.org"
+  OriginHost: "isbgmlcmg.epc.mnc006.mcc410.3gppnetwork.org"
 
   #Value to populate as the OriginRealm in Diameter responses
   OriginRealm: "epc.mnc006.mcc410.3gppnetwork.org"
 
   #Value to populate as the OriginHost in Diameter responses
-  DestinationHost: "isbvdra06.epc.mnc006.mcc410.3gppnetwork.org"
+  DestinationHost: "isbsps01.epc.mnc006.mcc410.3gppnetwork.org"
 
   #Value to populate as the OriginRealm in Diameter responses
   DestinationRealm: "epc.mnc006.mcc410.3gppnetwork.org"
@@ -42,7 +42,7 @@ mme:
   MNC: "06"
 
   #Enable GMLC / SLh Interface
-  SLh_enabled: False
+  SLh_enabled: True
 
   #IMSI of Test Subscriber for Unit Checks (Optional)
   test_sub_imsi: '001021234567890'
